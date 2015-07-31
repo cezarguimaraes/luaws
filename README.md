@@ -34,10 +34,10 @@ ws:send("Hello World!")
 -- Send a BINARY message:
 ws:sendBinary(vstruct.pack('3*u1', {255, 0, 0}))
 
--- ws:send() and ws:sendBinary() do **not** block and do **not** send the message 
+-- ws:send() and ws:sendBinary() do *not* block and do *not* send the message 
 -- The messages are buffered and sent later by calling ws:poll()
 
--- PS: If you are interest in a **pure** Lua library for packing and unpacking binary data,
+-- PS: If you are interest in a pure Lua library for packing and unpacking binary data,
 -- take a look at [vstruct](https://github.com/ToxicFrog/vstruct)
 
 -- Receive a message (buffered by ws:poll()) and pass it to a handler function
