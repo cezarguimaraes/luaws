@@ -64,7 +64,7 @@ Event Handling Example
 
 This is how I've used luaws while developing a game client.
 ```lua
-local ws, = luaws.connect(url, origin)
+local ws = luaws.connect(url, origin)
 if(not ws) then
 	error('Could not connect to websocket server')
 end	
