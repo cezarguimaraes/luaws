@@ -40,7 +40,7 @@ ws:sendBinary(vstruct.pack('3*u1', {255, 0, 0}))
 -- PS: If you are interest in a pure Lua library for packing and unpacking binary data,
 -- take a look at https://github.com/ToxicFrog/vstruct
 
--- Receive a message (buffered by ws:poll()) and pass it to a handler function
+-- Receive a message (buffered by ws:poll()) 
 -- ws:receive() also do *not* block since the message (if present) were previously buffered by ws:poll()
 local message = ws:receive()
 if(message) then

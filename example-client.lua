@@ -22,9 +22,10 @@ while(ws:getReadyState() ~= luaws.CLOSED) do
 
 	ws:poll(2000)
 
-	ws:dispatch(function(message)
+	local message = ws:receive()
+	if(message) then
 		print('Received: ' .. message)
-	end)
+	end
 end
 
 ws:close()
