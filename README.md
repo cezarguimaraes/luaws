@@ -40,12 +40,11 @@ ws:sendBinary(vstruct.pack('3*u1', {255, 0, 0}))
 -- PS: If you are interest in a pure Lua library for packing and unpacking binary data,
 -- take a look at https://github.com/ToxicFrog/vstruct
 
--- Receive a message (buffered by ws:poll()) 
--- ws:receive() also do *not* block since the message (if present) were previously buffered by ws:poll()
-local message = ws:receive()
-if(message) then
+-- Receive a message (buffered by ws:poll()) and pass it to a fucntion handler
+-- ws:dispatch() also do *not* block since the message (if present) were previously buffered by ws:poll()
+ws:dispatch(function(message)
 	-- Parse message
-end
+end)
 
 -- Perform the actual network IO:
 -- Won't block at all if timeout is 0 (the default)
@@ -77,10 +76,9 @@ while(ws:getReadyState() ~= luaws.CLOSED) do
 	-- Previous messages buffered by ws:send() will be sent here, when the socket is ready.
 	ws:poll(500)
 	-- Parse any incoming messages
-	local message = ws:receive()
-	if(message) then
+	ws:dispatch(function(message)
 		messageHandler(message)
-	end
+	end)
 
 	-- Check for requests from the main game thread and pass them to another handler
 	if(in_channel:peek()) then

@@ -13,6 +13,7 @@ using easywsclient::WebSocket;
 
 struct wsclient {
 	WebSocket::pointer ws;
+	int dispatch_ref; // reference to lua callback passed to ws:dispatch(func)
 } WSClient;
 
 
@@ -77,23 +78,33 @@ static int luaws_close(lua_State* L) {
 	return 0;
 }
 
+static int luaws_dispatch(lua_State* L) {
+	wsclient* ws = luaws_checkws(L);
+	if (!lua_isfunction(L, 2)) {
+		lua_pushnil(L);
+		lua_pushstring(L, "callback(message) expected.");
+		return 2;
+	}
+
+	int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	ws->dispatch_ref = ref;
+	lua_pushboolean(L, 1);
+
+	ws->ws->dispatch([L, ref](std::string message) {
+		lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+		lua_pushlstring(L, message.c_str(), message.length());
+
+		if (lua_pcall(L, 1, 0, 0) != 0)
+			lua_error(L);
+	});
+	
+	return 1;
+}
+
 static int luaws_poll(lua_State* L) {
 	wsclient* ws = luaws_checkws(L);
 	int timeout = lua_tonumber(L, 2);
 	ws->ws->poll(timeout);
-	return 0;
-}
-
-static int luaws_receive(lua_State* L) {
-	wsclient* ws = luaws_checkws(L);
-	std::string output;
-	ws->ws->dispatch([&output](std::string message) {
-		output = std::move(message);
-	});
-	if (output.size() != 0) {
-		lua_pushlstring(L, output.c_str(), output.length());
-		return 1;
-	}
 	return 0;
 }
 
@@ -112,8 +123,8 @@ static const struct luaL_Reg lib[] = {
 static const struct luaL_Reg methods[] = {
 	{"__tostring", luaws_tostring},
 	{ "send", luaws_send },
-	{ "sendBinary", luaws_sendBinary },
-	{ "receive", luaws_receive },
+	{ "sendBinary", luaws_sendBinary },	
+	{ "dispatch", luaws_dispatch },
 	{ "poll", luaws_poll },
 	{ "close", luaws_close },
 	{ "getReadyState", luaws_getReadyState },
