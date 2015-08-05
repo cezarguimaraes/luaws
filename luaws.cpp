@@ -3,8 +3,8 @@
 #include <string>
 
 extern "C" {
-#include "lua.h"
-#include "lauxlib.h"
+	#include "lua.h"
+	#include "lauxlib.h"
 }
 
 #include "easywsclient.hpp"
@@ -115,6 +115,13 @@ static int luaws_getReadyState(lua_State* L) {
 	return 1;
 }
 
+static int luaws_free(lua_State* L) {
+	wsclient* ws = luaws_checkws(L);
+	delete ws->ws;
+
+	return 1;
+}
+
 static const struct luaL_Reg lib[] = {
 	{ "connect", luaws_connect },	
 	{ NULL, NULL }
@@ -127,8 +134,8 @@ static const struct luaL_Reg methods[] = {
 	{ "dispatch", luaws_dispatch },
 	{ "poll", luaws_poll },
 	{ "close", luaws_close },
+	{ "free", luaws_free },
 	{ "getReadyState", luaws_getReadyState },
-	
 	{ NULL, NULL }
 };
 

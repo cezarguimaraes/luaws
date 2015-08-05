@@ -58,6 +58,9 @@ local state = ws:getReadyState()
 -- Close the WebSocket (sends a CLOSE message and then close() the actual socket)
 ws:close()
 
+-- Free the websocket handler's memory
+ws:free()
+
 ```
 
 Event Handling Example
@@ -88,6 +91,9 @@ end
 
 -- Close websocket
 ws:close()
+
+-- Free the websocket handler
+ws:free()
 ```
 
 Testing

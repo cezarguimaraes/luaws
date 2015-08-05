@@ -28,3 +28,5 @@ while(ws:getReadyState() ~= luaws.CLOSED) do
 end
 
 ws:close()
+
+ws:free()
